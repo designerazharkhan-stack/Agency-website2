@@ -1,0 +1,66 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isPublished() {
+      return resource.data.published == true;
+    }
+
+    // Public settings (site identity, homepage layout, SEO tags)
+    match /settings/{settingDoc} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // Services collection: Public can read published services, Admins can write
+    match /services/{serviceId} {
+      allow read: if isPublished() || isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    // Projects / Case Studies: Public can read published projects, Admins can write
+    match /projects/{projectId} {
+      allow read: if isPublished() || isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    // Blog Posts: Public can read published posts, Admins can write
+    match /blog_posts/{postId} {
+      allow read: if isPublished() || isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    // Testimonials: Public can read published reviews, Admins can write
+    match /testimonials/{testimonialId} {
+      allow read: if isPublished() || isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    // Pricing Plans: Public can read published plans, Admins can write
+    match /pricing_plans/{planId} {
+      allow read: if isPublished() || isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    // Contact Inquiries: Anyone can submit with validation; only Admins can read / delete
+    match /contact_messages/{messageId} {
+      allow create: if request.resource.data.name is string &&
+                       request.resource.data.name.size() > 0 &&
+                       request.resource.data.email is string &&
+                       request.resource.data.email.size() > 0 &&
+                       request.resource.data.message is string &&
+                       request.resource.data.message.size() > 0;
+      allow read, update, delete: if isAuthenticated();
+    }
+
+    // Admin profiles
+    match /admins/{adminId} {
+      allow read, write: if isAuthenticated() && request.auth.uid == adminId;
+    }
+  }
+}

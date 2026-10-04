@@ -1,0 +1,6 @@
+{
+  "name": "Agency Website",
+  "description": "Premium digital agency crafting bespoke digital experiences, high-performance web development, UI/UX design, and scalable brand platforms.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
